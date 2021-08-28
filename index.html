@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 class="is-size-4">Welcome, {{ name }}!</h2>
+<h3 class="is-size-6">Select an image to upload</h3>
+<p>
+	{% with messages = get_flashed_messages() %}
+	  {% if messages %}
+        <strong>Result: {{ messages[0] }}</strong>
+	  {% endif %}
+	{% endwith %}
+</p>
+<hr>
+<div class="columns is-centered">
+    <form method="post" action="/" enctype="multipart/form-data">
+        <div class="file">
+            <label class="file-label">
+                <input class="file-input" type="file" name="file" autocomplete="off" required accept="image/*" onchange="loadFile(event)">
+                <span class="file-cta">
+                    <span class="file-icon">
+                        <i class="fas fa-upload"></i>
+                    </span>
+                    <span class="file-label">
+                        Choose a file…
+                    </span>
+                </span>
+            </label>
+        </div>
+        <hr>
+        <input type="submit" value="Submit" class="button">
+    </form>
+</div>
+<script>
+    var loadFile = function(event) {
+        var output = document.getElementById('output');
+        output.src = URL.createObjectURL(event.target.files[0]);
+        output.onload = function() {
+            URL.revokeObjectURL(output.src) // free memory
+        }
+    };
+</script>
+<h3 class="is-size-6">Currently uploaded image:</h3>
+<div class="columns">
+    <div class="column"></div>
+    <div class="column"></div>
+    <figure class="column">    
+        {% if lastClassifiedImg > 0 %}
+        <figure class="image is-square">
+            <img id="output" src="{{ url_for('main.get_img', id=lastClassifiedImg) }}">
+        </figure>
+        {% else  %}
+        <figure class="image is-square">
+            <img id="output">
+        </figure>
+        {% endif %}
+    </figure>
+    <div class="column"></div>
+    <div class="column"></div>
+</div>
+<!-- /static/images.jpg-->
+<h3 class="is-size-6">Images classified before:</h3>
+<div class="columns">
+    {% for i in range(imageID-5, imageID+1) %}
+        {% if i > 0 %}
+        <figure class="column">
+            <figure class="image is-square">
+                <img src="{{ url_for('main.get_img', id=i) }}"/>
+            </figure>
+        </figure>
+        {% endif %}
+    {%endfor%}
+</div>
+{% endblock %}
